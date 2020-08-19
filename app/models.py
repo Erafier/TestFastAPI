@@ -2,12 +2,11 @@ from tortoise import fields, models
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 
-class Models(models.Model):
+class Rates(models.Model):
     """
-    Test Model
+    Model for storing data on insurance rate
     """
     id = fields.IntField(pk=True)
-    #: asd
     date = fields.DateField()
     cargo_type = fields.CharField(max_length=50)
     rate = fields.FloatField()
@@ -16,5 +15,5 @@ class Models(models.Model):
         unique_together = ('date', 'cargo_type')
 
 
-ModelPydantic = pydantic_model_creator(Models, name='Model')
-ModelInPydantic = pydantic_model_creator(Models, name='ModelIn', exclude_readonly=True)
+RatesPydantic = pydantic_model_creator(Rates, name='Model')
+RatesInPydantic = pydantic_model_creator(Rates, name='ModelIn', exclude_readonly=True)
