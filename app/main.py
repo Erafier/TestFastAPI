@@ -5,22 +5,26 @@ from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
-from app.models import RatesPydantic, RatesInPydantic, Rates
+from app.models import RatesInPydantic, Rates
 from app.schemas import Item
 
-app = FastAPI(title='Insurance calculator')
+app = FastAPI(
+    title="Insurance calculator",
+    description="Application by calculation the cost of insurance",
+    version='1.0.0'
+)
 
 
 @app.get("/insurance")
 async def calculate_insurance(
         declared_value: float,
         cargo_type: str,
-        date: Optional[datetime.date] = datetime.date.today()
+        date: Optional[datetime.date] = datetime.date.today(),
 ):
     try:
         model = await Rates.get(date=date, cargo_type=cargo_type)
     except DoesNotExist:
-        return f'Для даты {date} не указан тариф на товар {cargo_type}'
+        return f"For date {date} there is no tariff for type {cargo_type}"
     return {
         "insurance_cost": declared_value * model.rate,
     }
@@ -31,7 +35,7 @@ async def show_prices():
     return await RatesInPydantic.from_queryset(Rates.all())
 
 
-@app.post('/prices')
+@app.post("/prices")
 async def add_prices(records: Dict[str, List[Item]]):
     for date, record in records.items():
         for item in record:
@@ -40,10 +44,7 @@ async def add_prices(records: Dict[str, List[Item]]):
 
 
 @app.get("/prices/{date}")
-async def show_prices_by_date(
-        date: datetime.date,
-        cargo_type: Optional[str] = None
-):
+async def show_prices_by_date(date: datetime.date, cargo_type: Optional[str] = None):
     prices = Rates.filter(date=date)
     if cargo_type:
         price = await prices.get(cargo_type=cargo_type)
@@ -59,7 +60,7 @@ register_tortoise(
     add_exception_handlers=True,
 )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("main:app", port=7777, reload=True)
