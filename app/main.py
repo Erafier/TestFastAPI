@@ -59,7 +59,7 @@ async def show_prices_by_date(date: datetime.date, cargo_type: Optional[str] = N
 
 register_tortoise(
     app,
-    db_url=f"sqlite:///{os.path.join(BASE_DIR, 'database/db.sqlite3')}",
+    db_url=f"sqlite:///{os.path.join(BASE_DIR, 'db_data/db.sqlite3')}",
     modules={"models": ["app.models"]},
     generate_schemas=True,
     add_exception_handlers=True,

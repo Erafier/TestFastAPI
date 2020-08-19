@@ -6,7 +6,7 @@ services:
     command: bash -c "python app/main.py"
     container_name: api
     volumes:
-      - ./database/:/usr/src/app/database
+      - ./db_data/:/usr/src/app/db_data
     ports:
       - 7777:7777
     restart: always
