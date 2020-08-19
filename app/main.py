@@ -16,15 +16,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 app = FastAPI(
     title="Insurance calculator",
     description="Application by calculation the cost of insurance",
-    version='1.0.0'
+    version="1.0.0",
 )
 
 
 @app.get("/insurance")
 async def calculate_insurance(
-        declared_value: float,
-        cargo_type: str,
-        date: Optional[datetime.date] = datetime.date.today(),
+    declared_value: float,
+    cargo_type: str,
+    date: Optional[datetime.date] = datetime.date.today(),
 ):
     try:
         model = await Rates.get(date=date, cargo_type=cargo_type)
@@ -68,4 +68,4 @@ register_tortoise(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", port=7777, reload=True, host='0.0.0.0')
+    uvicorn.run("main:app", port=7777, reload=True, host="0.0.0.0")
