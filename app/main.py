@@ -3,14 +3,15 @@ import logging
 import os
 from typing import Dict, List, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
 from app.models import RatesInPydantic, Rates
 from app.schemas import Item
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = FastAPI(
@@ -22,9 +23,9 @@ app = FastAPI(
 
 @app.get("/insurance")
 async def calculate_insurance(
-    declared_value: float,
-    cargo_type: str,
-    date: Optional[datetime.date] = datetime.date.today(),
+        declared_value: float,
+        cargo_type: str,
+        date: Optional[datetime.date] = datetime.date.today(),
 ):
     try:
         model = await Rates.get(date=date, cargo_type=cargo_type)
@@ -46,6 +47,18 @@ async def add_prices(records: Dict[str, List[Item]]):
         for item in record:
             await Rates.create(date=date, **item.dict())
     return records
+
+
+@app.put("/prices/{date}")
+async def update_prices(
+        date: datetime.date,
+        cargo_type: str,
+        new_rate: float = Body(..., gt=0, lt=0.1, description='New rate must be greater than 0 and less than 0.1')):
+    entry = await Rates.get(date=date, cargo_type=cargo_type)
+    entry.rate = new_rate
+    await entry.save()
+    response = f'Rate for {entry.date} and {entry.cargo_type} successfully updated to {entry.rate}'
+    return response
 
 
 @app.get("/prices/{date}")

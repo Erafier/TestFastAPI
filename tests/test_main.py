@@ -53,6 +53,22 @@ def test_price_by_date_and_type():
     assert response.json()["rate"] == 0.01
 
 
+def test_correct_updated_rate():
+    new_rate = "0.05"
+    response = client_test.put("/prices/2020-10-10?cargo_type=Glass", data=new_rate)
+    assert response.status_code == 200
+    assert response.json() == "Rate for 2020-10-10 and Glass successfully updated to 0.05"
+
+    get_response = client_test.get("/prices/2020-10-10?cargo_type=Glass")
+    assert get_response.json()['rate'] == 0.05
+
+
+def test_incorrect_updated_rate():
+    new_rate = "0.2"
+    response = client_test.put("/prices/2020-10-10?cargo_type=Glass", data=new_rate)
+    assert response.status_code == 422
+
+
 def test_insurance_calculation_incorrect_date():
     response = client_test.get(
         "/insurance?declared_value=100000&cargo_type=Glass&date=2021-10-10"
