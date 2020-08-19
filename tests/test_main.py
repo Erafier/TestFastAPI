@@ -58,7 +58,7 @@ def test_insurance_calculation_incorrect_date():
         "/insurance?declared_value=100000&cargo_type=Glass&date=2021-10-10"
     )
     assert response.status_code == 200
-    assert response.json() == "Для даты 2021-10-10 не указан тариф на товар Glass"
+    assert response.json() == "For date 2021-10-10 there is no tariff for type Glass"
 
 
 def test_insurance_calculation_incorrect_values():

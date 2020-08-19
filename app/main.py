@@ -1,4 +1,6 @@
 import datetime
+import logging
+import os
 from typing import Dict, List, Optional
 
 from fastapi import FastAPI
@@ -7,6 +9,9 @@ from tortoise.exceptions import DoesNotExist
 
 from app.models import RatesInPydantic, Rates
 from app.schemas import Item
+
+logging.basicConfig(level=logging.DEBUG)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = FastAPI(
     title="Insurance calculator",
@@ -54,7 +59,7 @@ async def show_prices_by_date(date: datetime.date, cargo_type: Optional[str] = N
 
 register_tortoise(
     app,
-    db_url="sqlite://../database/db.sqlite3",
+    db_url=f"sqlite:///{os.path.join(BASE_DIR, 'database/db.sqlite3')}",
     modules={"models": ["app.models"]},
     generate_schemas=True,
     add_exception_handlers=True,
@@ -63,4 +68,4 @@ register_tortoise(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", port=7777, reload=True)
+    uvicorn.run("main:app", port=7777, reload=True, host='0.0.0.0')
